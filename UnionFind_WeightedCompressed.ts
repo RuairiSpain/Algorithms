@@ -3,8 +3,8 @@ export class QuickUnionUF {
     size = null;
 
     constructor(N: number) {
-        this.id = Array.from(Array(N).keys());
-        this.size = Array(N).fill(1);
+        this.id = Array.from(Array(N).keys()); // Create an array of the tree roots (initally single nodes, no children)
+        this.size = Array(N).fill(1); // Create a array with the size of each tree (initally all trees are size=1)
     }
 
     root(i: number): number {
