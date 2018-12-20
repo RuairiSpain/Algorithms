@@ -1,21 +1,22 @@
 export class QuickUnionUF {
-    id = null;
-    size = null;
+    parent = [];
+    size = [];
 
     constructor(N: number) {
-        this.id = Array.from(Array(N).keys()); // Create an array of the tree roots (initally single nodes, no children)
+        this.parent = Array.from(Array(N).keys()); // Create an array of the tree roots (initally single nodes, no children)
         this.size = Array(N).fill(1); // Create a array with the size of each tree (initally all trees are size=1)
+        console.log(this.groups());
     }
 
     root(i: number): number {
         /*
         With Path Compression - Path compression keeps the tree completely flat!
         */
-        if (i == this.id[i]) {
+        if (i == this.parent[i]) {
             return i;
         }
-        this.id[i] = this.root(this.id[i]);
-        return this.id[i];
+        this.parent[i] = this.root(this.parent[i]);
+        return this.parent[i];
     }
 
     connected(p: number, q: number): boolean {
@@ -32,15 +33,20 @@ export class QuickUnionUF {
         }
         if (this.size[i] < this.size[j]) {
             // tree p is smaller than q tree -> merge p into q
-            this.id[i] = j;
+            this.parent[i] = j;
             this.size[j] += this.size[i];
             console.log(`Attach root(${p}) = ${i} to root(${q}) = ${j}. Size root(${q}) = ${this.size[j]}`);
         } else {
             // tree p is equal or bigger than q tree -> merge q into p
-            this.id[j] = i;
+            this.parent[j] = i;
             this.size[i] += this.size[j];
             console.log(`Attach root(${q}) = ${j} to root(${p}) = ${i}. Size root(${p}) = ${this.size[j]}`);
         }
+    }
+    groups(): string {
+        return `
+                Parents: [ ${this.parent.join(" | ")}]
+                Sizes:   [ ${this.size.join(" | ")}] `;
     }
 }
 
@@ -60,23 +66,39 @@ function main() {
 
     //Notice the change in id[i] after a root() call.
     //The tree is
-    console.log(qf.id[0]);
-    console.log(qf.id[9]);
-    console.log(qf.id[6]);
-    console.log(qf.id[3]);
+    console.log(qf.parent[0]);
+    console.log(qf.parent[9]);
+    console.log(qf.parent[6]);
+    console.log(qf.parent[3]);
 
     console.log("Calling root(0)");
     console.log(qf.root(0));
     console.log("After path compression: ");
 
-    console.log(qf.id[0]);
-    console.log(qf.id[9]);
-    console.log(qf.id[6]);
-    console.log(qf.id[3]);
+    console.log(qf.parent[0]);
+    console.log(qf.parent[9]);
+    console.log(qf.parent[6]);
+    console.log(qf.parent[3]);
 
     //Other elements remain as they were before
     console.log("Other elements remain as they were before");
-    console.log(qf.id[8]);
+    console.log(qf.parent[8]);
+    console.log(qf.groups());
 }
 
 main();
+
+/*
+const rand = len => Math.floor(Math.random() * len);
+function big() {
+    const len = 100 * 2;
+    const qf = new QuickUnionUF(len);
+    for (let i = 0; i < len / 2; i++) {
+        qf.union(rand(len), rand(len));
+    }
+
+    console.log(qf.groups());
+}
+big();
+
+*/
